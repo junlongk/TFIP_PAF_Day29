@@ -17,6 +17,21 @@ public class TvService {
     @Autowired
     private MongoTemplate template;
 
+    /*
+    db.tv.aggregate([
+        { $unwind: "$genres" },
+        {
+            $group: {
+                _id: "$genres",
+                total: { $sum: 1}
+            }
+        },
+        {
+            $sort: { _id: 1}
+        }
+    ])
+     */
+
     public List<Document> countGenres() {
         // $unwind
         UnwindOperation unwindGenres = Aggregation.unwind(FIELD_GENRES);
@@ -35,6 +50,21 @@ public class TvService {
         return template.aggregate(pipeline, COLLECTION_TV, Document.class)
                 .getMappedResults();
     }
+
+    /*
+    db.tv.aggregate([
+        {
+            $bucket: {
+                groupBy: "$rating.average",
+                boundaries: [3, 6, 9],
+                default: ">9",
+                output: {
+                    titles: { $push: "$name" }
+                }
+            }
+        }
+    ])
+     */
 
     public List<Document> histogramOfRatings() {
 
